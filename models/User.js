@@ -1,24 +1,23 @@
 const mongoose = require('mongoose');
-
-const UserSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true
-  },
-  email: {
-    type: String,
-    required: true
-  },
-  password: String,
+const sdSchema = new mongoose.Schema({
+  username: String,
+  name: String,
+  email: String,
+  mobileno: String,
   googleID: String,
-  date: {
-    type: Date,
-    default: Date.now
-  },
-  image: String,
-  username: String
+  isMobVer: String,
+  isMedicalDetailsEntered: Boolean,
+  isMedDetEnt: Boolean,
+  otp: String,
+  userType: String,
+  password: String,
+  bookmarks: [{
+    type: mongoose.Types.ObjectId,
+    ref: 'article'
+  }],
+  profilePic: String
+}, {
+  timestamps: true
 });
 
-const User = mongoose.model('User', UserSchema);
-
-module.exports = User;
+module.exports = mongoose.model('user', sdSchema);

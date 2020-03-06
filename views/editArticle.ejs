@@ -1,0 +1,47 @@
+<div class="row mt-5 w-100 mx-auto">
+    <div class="col-md-6 m-auto">
+        <div class="card card-body mb-5">
+            <h1 class="text-center mb-3">
+                <i class="fa fa-user-plus"></i> Add Article
+            </h1>
+            <% include ./partials/messages %>
+            <form action="/article/edit/<%=article._id%>" method="POST">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" name="title" class="form-control" placeholder="Enter title"
+                        value="<%= article.title %>" />
+                </div>
+                <div class="form-group">
+                    <label for="text">Article Body</label>
+                    <textarea type="text" id="text" name="text" class="form-control" placeholder="Enter text"
+                        value="<%= article.text %>"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="topicType">Forum Type</label>
+                    <select class="form-control" id="topicType" name="topicType" value="<%= article.topicType %>">
+                        <option value="depression">Depression</option>
+                        <option value="anxiety">Anxiety</option>
+                        <option value="ptsd">PTSD</option>
+                        <option value="paranoia">Paranoia</option>
+                        <option value="substanceAbuse">Substance abuse</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="catering">Targeting or relevant to</label>
+                    <select class="form-control" id="catering" name="catering"
+                        value="<%= typeof catering != 'undefined' ? catering : '' %>">
+                        <option value="general">General</option>
+                        <option value="parents">Parents</option>
+                        <option value="teens">Teens</option>
+                        <option value="elderly">Elderly</option>
+                        <option value="middleAged">Middle aged</option>
+                        <option value="20s">20s</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    Edit Article
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,3 +1,47 @@
-<h1 class="mt-4">Dashboard</h1>
-<p class="lead mb-3">Welcome <%= user.name %></p>
-<a href="/users/logout" class="btn btn-secondary">Logout</a>
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+    <a class="navbar-brand" href="/dashboard">Dashboard</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="/dashboard" href="#">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Features</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Pricing</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link disabled" href="#">Disabled</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container w-100 mx-auto">
+    <% for(i=0; i<articles.length; i++) { %>
+    <div class="card mb-3">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-8 text-left">
+                    <p class="font-weight-bold"><%=articles[i].title%></p>
+                </div>
+                <div class="col-md-2">
+                    <p class="m-0">Forum:</p>
+                    <p class="m-0"><span class="badge badge-secondary"><%=articles[i].topicType%></span></p>
+                </div>
+                <div class="col-md-2">
+                    <p class="m-0">Targeting:</p>
+                    <p class="m-0"><span class="badge badge-dark"><%=articles[i].catering%></span></p>
+                </div>
+            </div>
+
+        </div>
+        <div class="card-body"><%=articles[i].text%>
+        </div>
+    </div>
+    <% } %>
+</div>

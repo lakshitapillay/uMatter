@@ -1,0 +1,22 @@
+<div class="row mt-5 w-100 mx-auto">
+    <div class="col-md-6 m-auto">
+        <div class="card card-body mb-5">
+            <h1 class="text-center mb-3">
+                <i class="fa fa-user-plus"></i> Enter Professional Details
+            </h1>
+            <% include ./partials/messages %>
+            <p class="w-100 text-center">Kindly enter your professional details. They must be verified by us. Till then
+                you will be allowed to view articles but not upload your own.</p>
+            <form action="/users/p/profDetails" method="POST">
+                <div class="form-group">
+                    <label for="dets">dets</label>
+                    <input type="text" id="dets" name="dets" class="form-control" placeholder="Enter text"
+                        value="<%= typeof dets != 'undefined' ? dets : '' %>" />
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    Submit Details
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

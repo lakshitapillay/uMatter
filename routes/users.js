@@ -6,22 +6,25 @@ const passport = require('passport');
 const User = require('../models/User');
 const { forwardAuthenticated, ensureAuthenticated } = require('../config/auth');
 
-// Login Page
-router.get('/login', forwardAuthenticated, (req, res) => res.render('login'));
+// Login Page Regular Users
+router.get('/u/login', forwardAuthenticated, (req, res) => {
+  req.session.userType = "regular";
+  res.render('userLogin');
+  console.log(req.session.userType);
+});
 
 // Register Page
-router.get('/register', forwardAuthenticated, (req, res) => res.render('register'));
+router.get('/u/register', forwardAuthenticated, (req, res) => res.render('userRegister'));
 
 // Register
-router.post('/register', async (req, res) => {
-  const { username, name, email, password, password2 } = req.body;
+router.post('/u/register', async (req, res) => {
+  console.log(req.body)
+  const { username, email, password, password2 } = req.body;
   let errors = [];
-  console.log(username)
-  if (!name || !email || !password || !password2 || !username) {
+  if (!email || !password || !password2 || !username) {
     errors.push({ msg: 'Please enter all fields' });
   }
   let users = await User.find({ username: username });
-  console.log(users);
   if (users.length != 0) {
     errors.push({ msg: 'Username has been taken' });
   }
@@ -34,30 +37,30 @@ router.post('/register', async (req, res) => {
   }
 
   if (errors.length > 0) {
-    res.render('register', {
-      errors,
-      name,
-      email,
-      password,
-      password2
+    res.render('userRegister', {
+      errors: errors,
+      username: username,
+      email: email,
+      password: password,
+      password2: password2
     });
   } else {
     user = await User.findOne({ email: email })
     if (user) {
       errors.push({ msg: 'Email already exists' });
-      res.render('register', {
-        errors,
-        name,
-        email,
-        password,
-        password2
+      res.render('userRegister', {
+        errors: errors,
+        username: username,
+        email: email,
+        password: password,
+        password2: password2
       });
     } else {
       const newUser = new User({
-        name,
         email,
         password,
-        username
+        username,
+        userType: "regular"
       });
 
       bcrypt.genSalt(10, (err, salt) => {
@@ -67,11 +70,8 @@ router.post('/register', async (req, res) => {
           newUser
             .save()
             .then(user => {
-              req.flash(
-                'success_msg',
-                'You are now registered and can log in'
-              );
-              res.redirect('/users/login');
+              req.flash('success_msg', 'You have been successfully registered');
+              res.redirect('/users/u/login');
             })
             .catch(err => console.log(err));
         });
@@ -80,55 +80,13 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login using other email
-router.post('/login', (req, res, next) => {
+//login using other email
+router.post('/u/login', (req, res, next) => {
   passport.authenticate('local', {
     successRedirect: '/dashboard',
-    failureRedirect: '/users/login',
+    failureRedirect: '/users/u/login',
     failureFlash: true
   })(req, res, next);
-});
-
-router.post('/login', (req, res, next) => {
-  passport.authenticate('local', {
-    successRedirect: '/dashboard',
-    failureRedirect: '/users/login',
-    failureFlash: true
-  })(req, res, next);
-});
-
-// Logout
-router.get('/logout', (req, res) => {
-  req.logout();
-  req.flash('success_msg', 'You are logged out');
-  res.redirect('/users/login');
-});
-
-router.get('/google', passport.authenticate(
-  'google',
-  {
-    scope: ['profile', 'email'],
-    prompt: 'select_account'
-  }
-));
-
-router.get('/google/callback',
-  passport.authenticate('google', { failureRedirect: '/' }),
-  (req, res) => {
-    if (req.user.username) {
-      res.redirect('/dashboard');
-    } else {
-      res.redirect('/users/addUsername');
-    }
-  });
-
-router.get('/verify', (req, res) => {
-  if (req.user) {
-    console.log('req.user');
-  }
-  else {
-    console.log('Not auth');
-  }
 });
 
 router.get('/addUsername', ensureAuthenticated, (req, res) => {
@@ -148,10 +106,99 @@ router.post('/addUsername', ensureAuthenticated, async (req, res) => {
       res.render('addUsername', { errors })
     }
     else {
-      let currentUser = await User.findOneAndUpdate({ googleID: req.user.googleID }, { $set: { username: req.body.username } });
+      let currentUser = await User.update({ googleID: req.user.googleID }, { $set: { username: req.body.username } });
       res.redirect('/dashboard')
     }
   }
 })
+
+// Login Page Professional Users
+router.get('/p/login', forwardAuthenticated, (req, res) => {
+  req.session.userType = "professional";
+  res.render('profLogin');
+});
+
+// Get Details Page Professional Users
+router.get('/p/profDetails', ensureAuthenticated, (req, res) => {
+  res.render('profDetails');
+});
+
+// Post Details Page Professional Users
+router.post('/p/profDetails', ensureAuthenticated, async (req, res) => {
+  const { dets } = req.body;
+  let errors = [];
+  if (!dets) {
+    errors.push({ msg: 'Please enter all fields' });
+  }
+
+  if (errors.length > 0) {
+    res.render('userRegister', {
+      dets,
+      errors
+    });
+  } else {
+    let updatedUser = await User.findByIdAndUpdate({ _id: req.user._id }, { $set: { isMedicalDetailsEntered: true } });
+    req.flash('success_msg', 'You have successfully entered your professional details. Kindly wait for 1-3 days for the verification process to complete.');
+    res.redirect('/dashboard');
+  }
+});
+
+// Logout
+router.get('/logout', (req, res) => {
+  if (req.user.userType == "regular") {
+    req.logout();
+    req.flash('success_msg', 'You are logged out');
+    res.redirect('/users/u/login');
+  } else {
+    req.logout();
+    req.flash('success_msg', 'You are logged out');
+    res.redirect('/users/p/login');
+  }
+});
+
+//google login
+router.get('/google', passport.authenticate(
+  'google',
+  {
+    scope: ['profile', 'email'],
+    prompt: 'select_account'
+  }
+));
+
+router.get('/google/callback',
+  passport.authenticate('google', { failureRedirect: '/' }),
+  (req, res) => {
+    if (!req.user.userType) {
+      User.findOneAndUpdate({ email: req.user.email }, { $set: { userType: req.session.userType } })
+        .then(async user => {
+          let user1 = await User.findOne({ email: req.user.email });
+          if (!user1.username && user1.userType == "regular") {
+            res.redirect('/users/addUsername');
+          } else if (user1.userType == "professional" && !user1.isMedicalDetailsEntered) {
+            res.redirect('/p/profDetails');
+          } else {
+            res.redirect('/dashboard');
+          }
+        })
+    } else {
+      if (!req.user.username && req.user.userType == "regular") {
+        res.redirect('/users/addUsername');
+      } else if (req.user.userType == "professional" && !req.user.isMedicalDetailsEntered) {
+        res.redirect('/users/p/profDetails');
+      } else {
+        res.redirect('/dashboard');
+      }
+    }
+
+  });
+
+router.get('/verify', (req, res) => {
+  if (req.user) {
+    console.log('req.user');
+  }
+  else {
+    console.log('Not auth');
+  }
+});
 
 module.exports = router;

@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const flash = require('connect-flash');
 const session = require('express-session');
+const bodyParser = require("body-parser");
 const path = require('path');
 
 const app = express();
@@ -27,8 +28,9 @@ mongoose
 app.use(expressLayouts);
 app.set('view engine', 'ejs');
 
-// Express body parser
-app.use(express.urlencoded({ extended: true }));
+//bodyparser middleware
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 // Express session
 app.use(
@@ -60,6 +62,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Routes
 app.use('/', require('./routes/index.js'));
 app.use('/users', require('./routes/users.js'));
+app.use('/article', require('./routes/article.js'));
 
 const PORT = process.env.PORT || 5000;
 
