@@ -1,0 +1,20 @@
+<div class="row mt-5">
+    <div class="col-md-6 m-auto">
+        <div class="card card-body">
+            <h1 class="text-center mb-3"><i class="fas fa-sign-in-alt"></i> Enter Username</h1>
+            <% include ./partials/messages %>
+            <p class="text-center w-100">
+                Kindly enter a username. This username will be shown to other users and will be your public name
+            </p>
+            <form action="/users/addUsername" method="POST">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="username" id="username" name="username" class="form-control"
+                        placeholder="Enter Username" />
+                </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Add Username</button>
+        </form>
+    </div>
+</div>
+</div>
